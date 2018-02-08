@@ -1,0 +1,73 @@
+plugins {
+    id "java"
+    id "idea"
+    id "signing"
+    id "ninja.miserable.blossom" version "1.0.1"
+    id "org.spongepowered.plugin" version "0.8.1"
+    id 'com.qixalite.spongestart2' version '3.0.1'
+}
+
+group = "rocks.gameonthe.pdm"
+version = "${major}.${minor}.${patch}-${api}-${suffix}"
+description = "Personal Dim Manager helps manage personal dims."
+
+if (System.getenv().BUILD_NUMBER != null) {
+    version += "-${System.getenv().BUILD_NUMBER}"
+}
+
+compileJava {
+    sourceCompatibility = targetCompatibility = "1.8"
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    jcenter()
+    maven {
+        name = "Sponge"
+        url = "http://repo.spongepowered.org/maven"
+    }
+    maven {
+        name = "Forge"
+        url = "http://files.minecraftforge.net/maven"
+    }
+    maven {
+        name = "Nucleus"
+        url = "http://repo.drnaylor.co.uk/artifactory/list/minecraft"
+    }
+    maven {
+        name "LuckPerms"
+        url "https://repo.lucko.me/"
+    }
+}
+
+dependencies {
+    compile("org.spongepowered:spongeapi:${spongeapi}")
+    compile("me.ryanhamshire:griefprevention:${griefprevention}:api")
+    compile("io.github.nucleuspowered:nucleus-api:${nucleus}")
+    runtimeOnly("me.ryanhamshire:griefprevention:${griefprevention}")
+    //compile fileTree(dir: "libs", include: "*.jar")
+}
+
+blossom {
+    def pluginInfo = "src/main/java/rocks/gameonthe/pdm/PluginInfo.java"
+
+    replaceToken "@NAME@", project.name, pluginInfo
+    replaceToken "@VERSION@", project.version, pluginInfo
+    replaceToken "@DESCRIPTION@", project.description, pluginInfo
+}
+
+spongestart {
+    online 'false'
+    minecraft '1.12.2'
+    type 'bleeding'
+    spongeForge properties.spongeforge
+    forgeServerFolder 'run/API7/'
+}
+
+signing {
+    required {Project.hasProperty("signing.keyId")}
+    sign configurations.archives
+}
