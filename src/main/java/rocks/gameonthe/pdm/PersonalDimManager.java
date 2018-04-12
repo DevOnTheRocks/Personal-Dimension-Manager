@@ -63,6 +63,9 @@ public class PersonalDimManager {
   private ConfigManager configManager;
   private GlobalConfig config;
 
+  @Inject
+  private Metrics metrics;
+
   private DimensionManager dimensionManager;
 
   private GriefPreventionPlugin griefPrevention;
