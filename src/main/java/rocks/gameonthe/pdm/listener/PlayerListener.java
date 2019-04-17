@@ -46,7 +46,7 @@ public class PlayerListener {
     PersonalDimension dim = plugin.getDimensionManager().getDimensions().get(event.getFromTransform().getExtent().getUniqueId());
     if (dim != null) {
       dim.previousLocation.put(player.getUniqueId(), event.getFromTransform().getPosition().toInt());
-      plugin.getConfigManager().save();
+      plugin.getDatabaseManager().save(dim);
     }
   }
 

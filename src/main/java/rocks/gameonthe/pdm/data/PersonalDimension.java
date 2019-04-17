@@ -4,6 +4,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
@@ -19,7 +20,6 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-@ConfigSerializable
 public class PersonalDimension {
 
   private PersonalDimension(UUID id, UUID owner, Text name) {
@@ -67,6 +67,11 @@ public class PersonalDimension {
       return this;
     }
 
+    public Builder name(String name) {
+      this.name = TextSerializers.FORMATTING_CODE.deserialize(name);
+      return this;
+    }
+
     public PersonalDimension build() {
       Preconditions.checkNotNull(id);
       Preconditions.checkNotNull(owner);
@@ -75,22 +80,11 @@ public class PersonalDimension {
     }
   }
 
-  @Setting("id")
   public UUID id;
-
-  @Setting("name")
   public String name = "Unknown";
-
-  @Setting("owner")
   public UUID owner;
-
-  @Setting("members")
+  public Timestamp created = Timestamp.from(Instant.now());
   public Set<UUID> members = Sets.newHashSet();
-
-  @Setting("created")
-  public Long created = Instant.now().getEpochSecond();
-
-  @Setting("previous-location")
   public Map<UUID, Vector3i> previousLocation = Maps.newHashMap();
 
   public Text getName() {
@@ -110,6 +104,6 @@ public class PersonalDimension {
   }
 
   public Date getDateCreated() {
-    return Date.from(Instant.ofEpochSecond(created));
+    return Date.from(created.toInstant());
   }
 }

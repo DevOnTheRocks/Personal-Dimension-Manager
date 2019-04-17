@@ -1,14 +1,14 @@
 package rocks.gameonthe.pdm.config;
 
-import com.google.common.collect.Maps;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.World;
-import rocks.gameonthe.pdm.data.PersonalDimension;
+import rocks.gameonthe.pdm.data.DimensionPreset;
 
 @ConfigSerializable
 public class GlobalConfig {
@@ -19,8 +19,8 @@ public class GlobalConfig {
   @Setting("world-template")
   private String template = "DIM-1";
 
-  @Setting("data")
-  private Map<UUID, PersonalDimension> data = Maps.newHashMap();
+  @Setting("world-presets")
+  private List<DimensionPreset> presets = Lists.newArrayList();
 
   public Optional<World> getSpawn() {
     return Sponge.getServer().getWorld(spawn);
@@ -38,7 +38,7 @@ public class GlobalConfig {
     this.template = world.getName();
   }
 
-  public Map<UUID, PersonalDimension> getData() {
-    return data;
+  public List<DimensionPreset> getPresets() {
+    return presets;
   }
 }

@@ -10,13 +10,17 @@ import static rocks.gameonthe.pdm.PluginInfo.VERSION;
 
 import com.google.inject.Inject;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.Optional;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
+import org.bstats.sponge.Metrics2;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
@@ -28,9 +32,10 @@ import org.spongepowered.api.plugin.PluginContainer;
 import rocks.gameonthe.pdm.command.DimManagerCommand;
 import rocks.gameonthe.pdm.config.ConfigManager;
 import rocks.gameonthe.pdm.config.GlobalConfig;
+import rocks.gameonthe.pdm.data.DatabaseManager;
 import rocks.gameonthe.pdm.data.DimensionManager;
+import rocks.gameonthe.pdm.data.DimensionPreset;
 import rocks.gameonthe.pdm.listener.PlayerListener;
-import rocks.gameonthe.pdm.listener.WorldListener;
 import rocks.gameonthe.pdm.plugin.GriefPreventionPlugin;
 
 @Plugin(
@@ -64,8 +69,9 @@ public class PersonalDimManager {
   private GlobalConfig config;
 
   @Inject
-  private Metrics metrics;
+  private Metrics2 metrics;
 
+  private DatabaseManager databaseManager;
   private DimensionManager dimensionManager;
 
   private GriefPreventionPlugin griefPrevention;
@@ -83,6 +89,12 @@ public class PersonalDimManager {
     configManager = new ConfigManager(this);
     configManager.save();
 
+    try {
+      databaseManager = new DatabaseManager(configDir + "/pdm");
+    } catch (SQLException e) {
+      logger.error("Unable to connect to DB", e);
+    }
+
     dimensionManager = new DimensionManager(this);
   }
 
@@ -91,10 +103,11 @@ public class PersonalDimManager {
     new DimManagerCommand(this);
 
     Sponge.getEventManager().registerListeners(this, new PlayerListener(this));
-    Sponge.getEventManager().registerListeners(this, new WorldListener(this));
+    //Sponge.getEventManager().registerListeners(this, new WorldListener(this));
 
     if (Sponge.getPluginManager().isLoaded("griefprevention")) {
       griefPrevention = new GriefPreventionPlugin(this);
+      Sponge.getEventManager().registerListeners(this, griefPrevention);
     }
   }
 
@@ -110,6 +123,10 @@ public class PersonalDimManager {
 
   public static PersonalDimManager getInstance() {
     return instance;
+  }
+
+  public static Logger getLogger() {
+    return instance.logger;
   }
 
   public GlobalConfig getConfig() {
@@ -132,8 +149,8 @@ public class PersonalDimManager {
     return configLoader;
   }
 
-  public Logger getLogger() {
-    return logger;
+  public DatabaseManager getDatabaseManager() {
+    return databaseManager;
   }
 
   public DimensionManager getDimensionManager() {

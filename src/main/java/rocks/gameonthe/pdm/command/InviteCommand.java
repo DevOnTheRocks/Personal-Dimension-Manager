@@ -67,7 +67,8 @@ public class InviteCommand implements CommandExecutor {
           }
         } else {
           dim.members.add(target.getUniqueId());
-          PersonalDimManager.getInstance().getConfigManager().save();
+          plugin.getGriefPrevention().ifPresent(gp -> gp.setTrust(dim));
+          plugin.getDatabaseManager().save(dim);
           src.sendMessage(Text.of(
               TextColors.GOLD, target.getName(), TextColors.GREEN, " successful added to ", TextColors.BLUE, dim.getName(), TextColors.GREEN, "."
           ));
@@ -90,7 +91,8 @@ public class InviteCommand implements CommandExecutor {
               PersonalDimension dim = invites.remove(user, target);
               if (dim != null) {
                 dim.members.add(target.getUniqueId());
-                PersonalDimManager.getInstance().getConfigManager().save();
+                PersonalDimManager.getInstance().getGriefPrevention().ifPresent(gp -> gp.setTrust(dim));
+                PersonalDimManager.getInstance().getDatabaseManager().save(dim);
                 src.sendMessage(Text.of("Invite accepted. Would you like to Teleport their now?"));
                 src.sendMessage(Text.of(
                     Text.of(TextColors.WHITE, "[", TextColors.GREEN, "YES", TextColors.WHITE, "] ").toBuilder()

@@ -17,18 +17,17 @@ public class WorldListener {
 
   @Listener
   public void onWorldLoad(LoadWorldEvent event, @Getter("getTargetWorld") World world) {
-    // Don't run for world not managed by this plugin
+    // Don't run for worlds not managed by this plugin
     if (!plugin.getDimensionManager().getDimensions().containsKey(world.getUniqueId())) {
       return;
     }
 
-    plugin.getGriefPrevention().ifPresent(gp -> gp.fixDateCreated(world));
-
+    // Do Stuff
   }
 
   @Listener
   public void onWorldUnload(UnloadWorldEvent event, @Getter("getTargetWorld") World world) {
-    // Don't run for world not managed by this plugin
+    // Don't run for worlds not managed by this plugin
     if (!plugin.getDimensionManager().getDimensions().containsKey(world.getUniqueId())) {
       return;
     }

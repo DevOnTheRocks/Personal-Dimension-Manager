@@ -32,7 +32,7 @@ public class SetNameCommand implements CommandExecutor {
         .description(Text.of("set the name of your dimension."))
         .permission(Permission.SET_NAME)
         .arguments(
-            GenericArguments.optional(GenericArguments.requiringPermission(GenericArguments.user(USER), Permission.DELETE_OTHERS)),
+            GenericArguments.optional(GenericArguments.requiringPermission(GenericArguments.user(USER), Permission.SET_NAME_OTHERS)),
             GenericArguments.text(NAME, TextSerializers.FORMATTING_CODE, true)
         )
         .executor(this)
@@ -55,9 +55,11 @@ public class SetNameCommand implements CommandExecutor {
         }
 
         dim.setName(name);
-        plugin.getConfigManager().save();
-        src.sendMessage(
-            Text.of(TextColors.GREEN, "Your dimension has successfully been renamed to ", TextColors.BLUE, dim.getName(), TextColors.GREEN, "."));
+        plugin.getDatabaseManager().save(dim);
+        src.sendMessage(Text.of(
+                TextColors.GREEN, "Your dimension has successfully been renamed to ",
+                TextColors.BLUE, dim.getName(), TextColors.GREEN, "."
+        ));
       }
     } else {
       throw new CommandException(Text.of(TextColors.RED, "This command requires a [user] argument to be run by a non-player."));

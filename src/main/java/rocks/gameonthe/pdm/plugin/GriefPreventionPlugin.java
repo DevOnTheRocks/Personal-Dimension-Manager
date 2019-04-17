@@ -1,9 +1,10 @@
 package rocks.gameonthe.pdm.plugin;
 
-import java.time.Instant;
+import com.google.common.collect.Lists;
 import me.ryanhamshire.griefprevention.GriefPrevention;
 import me.ryanhamshire.griefprevention.api.GriefPreventionApi;
-import org.spongepowered.api.world.World;
+import me.ryanhamshire.griefprevention.api.claim.ClaimManager;
+import me.ryanhamshire.griefprevention.api.claim.TrustType;
 import rocks.gameonthe.pdm.PersonalDimManager;
 import rocks.gameonthe.pdm.data.PersonalDimension;
 
@@ -17,13 +18,11 @@ public class GriefPreventionPlugin {
     this.gp = GriefPrevention.getApi();
   }
 
-  public void fixDateCreated(World world) {
-    PersonalDimension dim = plugin.getDimensionManager().getDimensions().get(world.getUniqueId());
-    Instant instant = gp.getClaimManager(world).getWildernessClaim().getData().getDateCreated();
-    if (dim != null && (Instant.ofEpochSecond(dim.created).isAfter(instant) || dim.created == 0)) {
-      dim.created = instant.getEpochSecond();
-      plugin.getConfigManager().save();
-    }
+  public void setTrust(PersonalDimension dimension) {
+    dimension.getWorld().ifPresent(world -> {
+      ClaimManager claimManager = gp.getClaimManager(world);
+      claimManager.getWildernessClaim().transferOwner(dimension.owner);
+      claimManager.getWildernessClaim().addUserTrusts(Lists.newArrayList(dimension.members), TrustType.BUILDER);
+    });
   }
-
 }
